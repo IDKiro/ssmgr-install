@@ -2,3 +2,4 @@ shadowsocks-libev.sh
 sm_node.sh
 template.yml
 sm.sh
+.gitignore
