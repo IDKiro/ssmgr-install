@@ -2,8 +2,8 @@ type: m
 empty: false
 
 manager:
-    address: 35.229.138.154:4001
-    password: '52zhuanBI'
+    address: 12.34.56.78:4001 //change 12.34.56.78 to the ip of your VPS
+    password: 'passwd'
 
 plugins:
     giftcard:
@@ -14,30 +14,11 @@ plugins:
         use: true
     account:
         use: true
-        pay:
-            hour:
-                price: 0.05
-                flow: 500000000
-            day:
-                price: 0.5
-                flow: 7000000000
-            week:
-                price: 3
-                flow: 50000000000
-            month:
-                price: 10
-                flow: 200000000000
-            season:
-                price: 30
-                flow: 200000000000
-            year:
-                price: 120
-                flow: 200000000000
     email:
         use: true
         type: 'mailgun'
-        baseUrl: 'https://api.mailgun.net/v3/mg.idkiro.xyz'
-        apiKey: 'key-0bc7ca60da9495ecd74cca8aa9c9c510'       
+        baseUrl: 'https://api.mailgun.net/v3/mg.xxxxxxx.xxx'
+        apiKey: 'key-xxxxxxxxxxxxxxxxxxxxxx'       
     webgui:
         use: true
         host: '0.0.0.0'
@@ -46,34 +27,17 @@ plugins:
         icon: 'icon.png'
         gcmSenderId: '456102641793'
         gcmAPIKey: 'AAAAGzzdqrE:XXXXXXXXXXXXXX'
+    alipay:
+        use: true
+        appid: 
+        notifyUrl: ''
+        merchantPrivateKey: ''
+        alipayPublicKey: ''
+        gatewayUrl: 'https://openapi.alipay.com/gateway.do'
     paypal:
         use: true
         mode: 'sandbox' # sandbox or live
-        client_id: 'Ab-TJPLlEW6j7dCEMfcpkA3r907vbbOiCKnfU_RrhofmPB1MPlKs_nnUq3v4hE79hbmAXsIqUUmvoO2y'
-        client_secret: 'EDLAXHwzdJEUUpK7zDBxzPZZGpdZGatxwKjvAdKm2x45Fe4vFlvqJGlohxEXKgfECW-wr5Y1e4Tlvikv'
+        client_id: ''
+        client_secret: ''
 
 db: 'webgui.sqlite'
-
-
-
-type: s
-empty: false
-shadowsocks:
-  address: 127.0.0.1:4000
-manager:
-  address: 0.0.0.0:4001
-  password: '52zhuanBI'
-db: 'ss.sqlite'
-
-
-
-manager:
-screen -dmS ss-manager ss-manager -m aes-256-cfb -u --manager-address 127.0.0.1:4000
-screen -dmS ss ssmgr -c /root/.ssmgr/ss.yml
-screen -dmS webgui ssmgr -c /root/.ssmgr/webgui.yml
-
-server:
-screen -dmS ss-manager ss-manager -m aes-256-cfb -u --manager-address 127.0.0.1:4000
-cd /root/shadowsocks-manager-tiny/
-screen -dmS ss node index.js 127.0.0.1:4000 0.0.0.0:4001 52zhuanBI
-

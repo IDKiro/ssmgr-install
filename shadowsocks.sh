@@ -157,8 +157,3 @@ disable_selinux
 pre_install
 download_files
 install_shadowsocks
-
-# How to set boot
-# chmod +x /etc/init.d/shadowsocks
-# chkconfig --add shadowsocks
-# chkconfig shadowsocks on
