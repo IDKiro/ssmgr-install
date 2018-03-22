@@ -1,0 +1,2 @@
+# shadowsocks-manager installation script
+
