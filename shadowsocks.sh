@@ -69,7 +69,7 @@ download() {
 # Download latest shadowsocks-libev
 download_files(){
     cd ${cur_dir}
-
+    get_latest_version
     download "${shadowsocks_libev_ver}.tar.gz" "${download_link}"
     download "${libsodium_file}.tar.gz" "${libsodium_url}"
     download "${mbedtls_file}-gpl.tgz" "${mbedtls_url}"
@@ -127,6 +127,5 @@ install_shadowsocks(){
 # Installation start
 disable_selinux
 pre_install
-get_latest_version
 download_files
 install_shadowsocks
