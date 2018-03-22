@@ -11,27 +11,6 @@ libsodium_url="https://github.com/jedisct1/libsodium/releases/download/1.0.16/li
 mbedtls_file="mbedtls-2.6.0"
 mbedtls_url="https://tls.mbed.org/download/mbedtls-2.6.0-gpl.tgz"
 
-# Stream Ciphers
-ciphers=(
-aes-256-gcm
-aes-192-gcm
-aes-128-gcm
-aes-256-ctr
-aes-192-ctr
-aes-128-ctr
-aes-256-cfb
-aes-192-cfb
-aes-128-cfb
-camellia-128-cfb
-camellia-192-cfb
-camellia-256-cfb
-xchacha20-ietf-poly1305
-chacha20-ietf-poly1305
-chacha20-ietf
-chacha20
-salsa20
-rc4-md5
-)
 # Color
 red='\033[0;31m'
 green='\033[0;32m'
