@@ -1,0 +1,79 @@
+type: m
+empty: false
+
+manager:
+    address: 35.229.138.154:4001
+    password: '52zhuanBI'
+
+plugins:
+    giftcard:
+        use: true
+    flowSaver:
+        use: true
+    user:
+        use: true
+    account:
+        use: true
+        pay:
+            hour:
+                price: 0.05
+                flow: 500000000
+            day:
+                price: 0.5
+                flow: 7000000000
+            week:
+                price: 3
+                flow: 50000000000
+            month:
+                price: 10
+                flow: 200000000000
+            season:
+                price: 30
+                flow: 200000000000
+            year:
+                price: 120
+                flow: 200000000000
+    email:
+        use: true
+        type: 'mailgun'
+        baseUrl: 'https://api.mailgun.net/v3/mg.idkiro.xyz'
+        apiKey: 'key-0bc7ca60da9495ecd74cca8aa9c9c510'       
+    webgui:
+        use: true
+        host: '0.0.0.0'
+        port: '8080'
+        site: 'http://127.0.0.1'
+        icon: 'icon.png'
+        gcmSenderId: '456102641793'
+        gcmAPIKey: 'AAAAGzzdqrE:XXXXXXXXXXXXXX'
+    paypal:
+        use: true
+        mode: 'sandbox' # sandbox or live
+        client_id: 'Ab-TJPLlEW6j7dCEMfcpkA3r907vbbOiCKnfU_RrhofmPB1MPlKs_nnUq3v4hE79hbmAXsIqUUmvoO2y'
+        client_secret: 'EDLAXHwzdJEUUpK7zDBxzPZZGpdZGatxwKjvAdKm2x45Fe4vFlvqJGlohxEXKgfECW-wr5Y1e4Tlvikv'
+
+db: 'webgui.sqlite'
+
+
+
+type: s
+empty: false
+shadowsocks:
+  address: 127.0.0.1:4000
+manager:
+  address: 0.0.0.0:4001
+  password: '52zhuanBI'
+db: 'ss.sqlite'
+
+
+
+manager:
+screen -dmS ss-manager ss-manager -m aes-256-cfb -u --manager-address 127.0.0.1:4000
+screen -dmS ss ssmgr -c /root/.ssmgr/ss.yml
+screen -dmS webgui ssmgr -c /root/.ssmgr/webgui.yml
+
+server:
+screen -dmS ss-manager ss-manager -m aes-256-cfb -u --manager-address 127.0.0.1:4000
+cd /root/shadowsocks-manager-tiny/
+screen -dmS ss node index.js 127.0.0.1:4000 0.0.0.0:4001 52zhuanBI
+
