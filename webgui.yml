@@ -14,28 +14,27 @@ plugins:
         use: true
     account:
         use: true
-    email:
-        use: true
-        type: 'mailgun'
-        baseUrl: 'https://api.mailgun.net/v3/mg.xxxxxxx.xxx'
-        apiKey: 'key-xxxxxxxxxxxxxxxxxxxxxx'       
     webgui:
         use: true
         host: '0.0.0.0'
         port: '80'
-        site: 'http://127.0.0.1'
-        icon: 'icon.png'
-        gcmSenderId: '456102641793'
-        gcmAPIKey: 'AAAAGzzdqrE:XXXXXXXXXXXXXX'
+        site: 'http://12.34.56.78'
+        gcmSenderId: ''
+        gcmAPIKey: ''
+    email:
+        use: false
+        type: 'mailgun'
+        baseUrl: ''
+        apiKey: ''
     alipay:
-        use: true
+        use: false
         appid: 
         notifyUrl: ''
         merchantPrivateKey: ''
         alipayPublicKey: ''
         gatewayUrl: 'https://openapi.alipay.com/gateway.do'
     paypal:
-        use: true
+        use: false
         mode: 'sandbox' # sandbox or live
         client_id: ''
         client_secret: ''

@@ -32,7 +32,6 @@ get_latest_version(){
     [ -z ${ver} ] && echo "Error: Get shadowsocks-libev latest version failed" && exit 1
     shadowsocks_libev_ver="shadowsocks-libev-$(echo ${ver} | sed -e 's/^[a-zA-Z]//g')"
     download_link="https://github.com/shadowsocks/shadowsocks-libev/releases/download/${ver}/${shadowsocks_libev_ver}.tar.gz"
-    ss_init_script_link="https://raw.githubusercontent.com/IDKiro/ssmgr-install/master/shadowsocks"
 }
 
 pre_install(){
@@ -73,7 +72,6 @@ download_files(){
     download "${shadowsocks_libev_ver}.tar.gz" "${download_link}"
     download "${libsodium_file}.tar.gz" "${libsodium_url}"
     download "${mbedtls_file}-gpl.tgz" "${mbedtls_url}"
-    download "/etc/init.d/shadowsocks" "${ss_init_script_link}"
 }
 
 install_libsodium() {
@@ -122,6 +120,8 @@ install_shadowsocks(){
     rm -rf ${libsodium_file} ${libsodium_file}.tar.gz
     rm -rf ${mbedtls_file} ${mbedtls_file}-gpl.tgz
     clear
+
+    echo "Shadowsocks-libev install completed"
 }
 
 # Installation start
