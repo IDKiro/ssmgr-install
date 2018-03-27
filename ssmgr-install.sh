@@ -305,28 +305,25 @@ set_ssmgrt_startup(){
 }
 
 install_ssmgr(){
-    get_information
-    firewall_set
-    install_nodejs
     npm_install_ssmgr
     set_ssmgr
     set_ssmgr_startup
 }
 
 install_ssmgrt(){
-    get_information
-    firewall_set
-    install_nodejs
     get_ssmgrt
     set_ssmgrt_startup
 }
 
 # Installation start
 install_selected
+get_information
 disable_selinux
 pre_install
 download_files
 install_shadowsocks
+firewall_set
+install_nodejs
 if [ "${selected}" == "1" ]; then
     install_ssmgr
 else
