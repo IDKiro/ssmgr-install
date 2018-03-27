@@ -1,7 +1,5 @@
 # shadowsocks-manager 一键安装脚本 beta
 
-**warning：现阶段主要用于自用**
-
 系统要求：Centos 7
 
 内存要求：控制面板≥1G，节点≥128M

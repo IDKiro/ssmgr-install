@@ -226,6 +226,8 @@ firewall_set(){
         firewall-cmd --permanent --zone=public --add-port=${ssport}/udp
         firewall-cmd --permanent --zone=public --add-port=${mgrport}/tcp
         firewall-cmd --permanent --zone=public --add-port=${mgrport}/udp
+        firewall-cmd --permanent --zone=public --add-port=80/tcp
+        firewall-cmd --permanent --zone=public --add-port=80/udp
         firewall-cmd --permanent --zone=public --add-port=50000-60000/tcp
         firewall-cmd --permanent --zone=public --add-port=50000-60000/udp
         firewall-cmd --reload
