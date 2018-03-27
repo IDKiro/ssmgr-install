@@ -2,7 +2,7 @@ type: m
 empty: false
 
 manager:
-    address: 12.34.56.78:4001 //change 12.34.56.78 to the ip of your VPS
+    address: 12.34.56.78:4001
     password: 'passwd'
 
 plugins:
