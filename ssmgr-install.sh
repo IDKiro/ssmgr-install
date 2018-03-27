@@ -243,7 +243,7 @@ install_selected(){
     do
     echo
     echo "#############################################################"
-    echo "# One click Install shadowsocks-manager for Centos 7        #"
+    echo "# One click Install shadowsocks-manager for CentOS 7        #"
     echo "# Github: https://github.com/IDKiro/ssmgr-install           #"
     echo "# Author: IDKiro                                            #"
     echo "# Please choose the server you want                         #"

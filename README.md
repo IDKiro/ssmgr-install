@@ -30,15 +30,14 @@ chmod +x ssmgr-install.sh
 email:
     use: true
     username: 'username'
-    password: 'password'
-    host: 'smtp.your-email.com'
+    password: 'password'    host: 'smtp.your-email.com'
 ```
 
 mailgun：
 
 ```
 email:
-    use: false
+    use: true
     type: 'mailgun'
     baseUrl: 'https://api.mailgun.net/v3/mg.xxxxx.xxx'
     apiKey: 'key-xxxxxxxxxxxxx'
