@@ -5,6 +5,12 @@ export PATH
 # Current folder
 cur_dir=`pwd`
 
+libsodium_file="libsodium-1.0.16"
+libsodium_url="https://github.com/jedisct1/libsodium/releases/download/1.0.16/libsodium-1.0.16.tar.gz"
+
+mbedtls_file="mbedtls-2.6.0"
+mbedtls_url="https://tls.mbed.org/download/mbedtls-2.6.0-gpl.tgz"
+
 ciphers=(
 aes-256-cfb
 aes-192-cfb
@@ -213,13 +219,61 @@ get_information(){
     echo
 }
 
+firewall_set(){
+    systemctl status firewalld > /dev/null 2>&1
+    if [ $? -eq 0 ]; then
+        firewall-cmd --permanent --zone=public --add-port=${ssport}/tcp
+        firewall-cmd --permanent --zone=public --add-port=${ssport}/udp
+        firewall-cmd --permanent --zone=public --add-port=${mgrport}/tcp
+        firewall-cmd --permanent --zone=public --add-port=${mgrport}/udp
+        firewall-cmd --permanent --zone=public --add-port=50000-60000/tcp
+        firewall-cmd --permanent --zone=public --add-port=50000-60000/udp
+        firewall-cmd --reload
+    else
+        echo -e "[${yellow}Warning${plain}] firewalld looks like not running or not installed."
+        echo -e "[${yellow}Warning${plain}] If you use iptables, you may need to change it's setting."
+    fi
+    echo -e "[${green}Info${plain}] firewall set completed..."
+}
+
+install_selected(){
+    while true
+    do
+    echo
+    echo "#############################################################"
+    echo "# One click Install shadowsocks-manager for Centos 7        #"
+    echo "# Github: https://github.com/IDKiro/ssmgr-install           #"
+    echo "# Author: IDKiro                                            #"
+    echo "# Please choose the server you want                         #"
+    echo "# 1  shadowsocks-manager and node                           #"
+    echo "# 2  Only the node                                          #"
+    echo "#############################################################"
+    echo
+    read -p "Please enter a number:" selected
+    case "${selected}" in
+        1|2)
+        break
+        ;;
+        *)
+        echo -e "[${red}Error${plain}] Please only enter a number [1-2]"
+        ;;
+    esac
+    done
+}
+
 install_nodejs(){
 	curl -sL https://rpm.nodesource.com/setup_6.x | bash -
     yum install -y nodejs
 }
 
-install_ssmgr(){
+npm_install_ssmgr(){
 	npm i -g shadowsocks-manager
+    npm i -g pm2
+}
+
+get_ssmgrt(){
+    cd /root
+    git clone https://github.com/gyteng/shadowsocks-manager-tiny.git
     npm i -g pm2
 }
 
@@ -234,3 +288,51 @@ set_ssmgr(){
     sed -i "s#4000#${ssport}#g" /root/.ssmgr/webgui.yml
     sed -i "s#passwd#${ssmgrpwd}#g" /root/.ssmgr/webgui.yml
 }
+
+set_ssmgr_startup(){
+    pm2 --name "webgui" -f start ssmgr -x -- -c /root/.ssmgr/webgui.yml
+    pm2 --name "ss" -f start ssmgr -x -- -c /root/.ssmgr/ss.yml -r libev:${shadowsockscipher}
+    pm2 save
+    pm2 startup
+}
+
+set_ssmgrt_startup(){
+    pm2 --name "ss" -f start /root/shadowsocks-manager-tiny/index.js -x -- 127.0.0.1:${ssport} 0.0.0.0:${mgrport} ${ssmgrpwd} libev:${shadowsockscipher}
+    pm2 save
+    pm2 startup
+}
+
+install_ssmgr(){
+    get_information
+    firewall_set
+    install_nodejs
+    npm_install_ssmgr
+    set_ssmgr
+    set_ssmgr_startup
+}
+
+install_ssmgrt(){
+    get_information
+    firewall_set
+    install_nodejs
+    get_ssmgrt
+    set_ssmgrt_startup
+}
+
+# Installation start
+install_selected
+disable_selinux
+pre_install
+download_files
+install_shadowsocks
+if [ "${selected}" == "1" ]; then
+    install_ssmgr
+else
+    install_ssmgrt
+fi
+
+echo "#############################################################"
+echo "# Install shadowsocks-manager  Success                      #"
+echo "# Author: IDKiro                                            #"
+echo "# Github: https://github.com/IDKiro/ssmgr-install           #"
+echo "#############################################################"
