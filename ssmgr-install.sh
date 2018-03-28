@@ -99,9 +99,10 @@ centosversion(){
 check_centos7(){
     if check_sys sysRelease && centos centosversion 7; then
         return 0
+    else
+        echo -e "[${red}Error${plain}] The script only support CentOS 7."
+        exit 1
     fi
-    echo -e "[${red}Error${plain}] The script only support CentOS 7."
-    exit 1
 }
 
 disable_selinux(){
