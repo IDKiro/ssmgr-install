@@ -97,7 +97,7 @@ centosversion(){
 }
 
 check_centos7(){
-    if [ check_sys sysRelease ] && [ centos centosversion 7 ]; then
+    if check_sys sysRelease && centos centosversion 7; then
         return 0
     fi
     echo -e "[${red}Error${plain}] The script only support CentOS 7."
