@@ -313,13 +313,13 @@ get_information()
     ipaddress="$(get_ip)"
 
     echo
-    echo "---------------------------"
+    echo "-----------------------------------------------------"
     echo -e "Server ip:                 ${ipaddress}"
     echo -e "password:                  ${ssmgrpwd}"
     echo -e "shadowsocks-libev port:    ${ssport}"
     echo -e "shadowsocks-manager port:  ${mgrport}"
     echo -e "cipher:                    ${shadowsockscipher}"
-    echo "---------------------------"
+    echo "-----------------------------------------------------"
     echo
 }
 
