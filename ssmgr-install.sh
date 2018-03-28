@@ -36,6 +36,74 @@ plain='\033[0m'
 # Make sure only root can run our script
 [[ $EUID -ne 0 ]] && echo -e "[${red}Error${plain}] This script must be run as root!" && exit 1
 
+check_sys(){
+    local checkType=$1
+    local value=$2
+
+    local release=''
+    local systemPackage=''
+
+    if [[ -f /etc/redhat-release ]]; then
+        release="centos"
+        systemPackage="yum"
+    elif cat /etc/issue | grep -Eqi "debian"; then
+        release="debian"
+        systemPackage="apt"
+    elif cat /etc/issue | grep -Eqi "ubuntu"; then
+        release="ubuntu"
+        systemPackage="apt"
+    elif cat /etc/issue | grep -Eqi "centos|red hat|redhat"; then
+        release="centos"
+        systemPackage="yum"
+    elif cat /proc/version | grep -Eqi "debian"; then
+        release="debian"
+        systemPackage="apt"
+    elif cat /proc/version | grep -Eqi "ubuntu"; then
+        release="ubuntu"
+        systemPackage="apt"
+    elif cat /proc/version | grep -Eqi "centos|red hat|redhat"; then
+        release="centos"
+        systemPackage="yum"
+    fi
+
+    if [[ ${checkType} == "sysRelease" ]]; then
+        if [ "$value" == "$release" ]; then
+            return 0
+        else
+            return 1
+        fi
+    elif [[ ${checkType} == "packageManager" ]]; then
+        if [ "$value" == "$systemPackage" ]; then
+            return 0
+        else
+            return 1
+        fi
+    fi
+}
+
+centosversion(){
+    if check_sys sysRelease centos; then
+        local code=$1
+        local version="$(getversion)"
+        local main_ver=${version%%.*}
+        if [ "$main_ver" == "$code" ]; then
+            return 0
+        else
+            return 1
+        fi
+    else
+        return 1
+    fi
+}
+
+check_centos7(){
+    if [ check_sys sysRelease ] && [ centos centosversion 7 ]; then
+        return 0
+    fi
+    echo -e "[${red}Error${plain}] The script only support CentOS 7."
+    exit 1
+}
+
 disable_selinux(){
     if [ -s /etc/selinux/config ] && grep 'SELINUX=enforcing' /etc/selinux/config; then
         sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
@@ -316,6 +384,7 @@ install_ssmgrt(){
 }
 
 # Installation start
+check_centos7
 install_selected
 get_information
 disable_selinux
