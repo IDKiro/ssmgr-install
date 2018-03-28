@@ -36,7 +36,8 @@ plain='\033[0m'
 # Make sure only root can run our script
 [[ $EUID -ne 0 ]] && echo -e "[${red}Error${plain}] This script must be run as root!" && exit 1
 
-check_sys(){
+check_sys()
+{
     local checkType=$1
     local value=$2
 
@@ -81,7 +82,8 @@ check_sys(){
     fi
 }
 
-getversion(){
+getversion()
+{
     if [[ -s /etc/redhat-release ]]; then
         grep -oE  "[0-9.]+" /etc/redhat-release
     else
@@ -89,7 +91,8 @@ getversion(){
     fi
 }
 
-centosversion(){
+centosversion()
+{
     if check_sys sysRelease centos; then
         local code=$1
         local version="$(getversion)"
@@ -104,7 +107,8 @@ centosversion(){
     fi
 }
 
-check_centos7(){
+check_centos7()
+{
     if check_sys sysRelease centos && centosversion 7; then
         return 0
     else
@@ -113,21 +117,24 @@ check_centos7(){
     fi
 }
 
-disable_selinux(){
+disable_selinux()
+{
     if [ -s /etc/selinux/config ] && grep 'SELINUX=enforcing' /etc/selinux/config; then
         sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
         setenforce 0
     fi
 }
 
-get_latest_version(){
+get_latest_version()
+{
     ver=$(wget --no-check-certificate -qO- https://api.github.com/repos/shadowsocks/shadowsocks-libev/releases/latest | grep 'tag_name' | cut -d\" -f4)
     [ -z ${ver} ] && echo "Error: Get shadowsocks-libev latest version failed" && exit 1
     shadowsocks_libev_ver="shadowsocks-libev-$(echo ${ver} | sed -e 's/^[a-zA-Z]//g')"
     download_link="https://github.com/shadowsocks/shadowsocks-libev/releases/download/${ver}/${shadowsocks_libev_ver}.tar.gz"
 }
 
-pre_install(){
+pre_install()
+{
     echo -e "[${green}Info${plain}] Checking the EPEL repository..."
     if [ ! -f /etc/yum.repos.d/epel.repo ]; then
         yum install -y -q epel-release
@@ -141,7 +148,8 @@ pre_install(){
     yum install -y -q unzip openssl openssl-devel gettext gcc autoconf libtool automake make asciidoc xmlto libev-devel pcre pcre-devel git c-ares-devel
 }
 
-download() {
+download()
+{
     local filename=${1}
     local cur_dir=`pwd`
     if [ -s ${filename} ]; then
@@ -159,7 +167,8 @@ download() {
 }
 
 # Download latest shadowsocks-libev
-download_files(){
+download_files()
+{
     cd ${cur_dir}
     get_latest_version
     download "${shadowsocks_libev_ver}.tar.gz" "${download_link}"
@@ -167,7 +176,8 @@ download_files(){
     download "${mbedtls_file}-gpl.tgz" "${mbedtls_url}"
 }
 
-install_libsodium() {
+install_libsodium()
+{
     if [ ! -f /usr/lib/libsodium.a ]; then
         cd ${cur_dir}
         tar zxf ${libsodium_file}.tar.gz
@@ -182,7 +192,8 @@ install_libsodium() {
     fi
 }
 
-install_mbedtls() {
+install_mbedtls()
+{
     if [ ! -f /usr/lib/libmbedtls.a ]; then
         cd ${cur_dir}
         tar xf ${mbedtls_file}-gpl.tgz
@@ -199,7 +210,8 @@ install_mbedtls() {
 }
 
 # Install Shadowsocks-libev
-install_shadowsocks(){
+install_shadowsocks()
+{
     install_libsodium
     install_mbedtls
     ldconfig
@@ -217,14 +229,16 @@ install_shadowsocks(){
     echo "Shadowsocks-libev install completed"
 }
 
-get_ip(){
+get_ip()
+{
     local IP=$( ip addr | egrep -o '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | egrep -v "^192\.168|^172\.1[6-9]\.|^172\.2[0-9]\.|^172\.3[0-2]\.|^10\.|^127\.|^255\.|^0\." | head -n 1 )
     [ -z ${IP} ] && IP=$( wget -qO- -t1 -T2 ipv4.icanhazip.com )
     [ -z ${IP} ] && IP=$( wget -qO- -t1 -T2 ipinfo.io/ip )
     [ ! -z ${IP} ] && echo ${IP} || echo
 }
 
-get_information(){
+get_information()
+{
     # Set shadowsocks-manager password
     echo "Please enter password of shadowsocks-manager:"
     read -p "(Default password: 123456):" ssmgrpwd
@@ -296,7 +310,8 @@ get_information(){
     echo
 }
 
-firewall_set(){
+firewall_set()
+{
     systemctl status firewalld > /dev/null 2>&1
     if [ $? -eq 0 ]; then
         firewall-cmd --permanent --zone=public --add-port=${ssport}/tcp
@@ -315,7 +330,8 @@ firewall_set(){
     echo -e "[${green}Info${plain}] firewall set completed..."
 }
 
-install_selected(){
+install_selected()
+{
     while true
     do
     echo
@@ -340,23 +356,27 @@ install_selected(){
     done
 }
 
-install_nodejs(){
+install_nodejs()
+{
 	curl -sL https://rpm.nodesource.com/setup_6.x | bash -
     yum install -y nodejs
 }
 
-npm_install_ssmgr(){
+npm_install_ssmgr()
+{
 	npm i -g shadowsocks-manager
     npm i -g pm2
 }
 
-get_ssmgrt(){
+get_ssmgrt()
+{
     cd /root
     git clone https://github.com/gyteng/shadowsocks-manager-tiny.git
     npm i -g pm2
 }
 
-set_ssmgr(){
+set_ssmgr()
+{
     mkdir /root/.ssmgr
     wget -N -P  /root/.ssmgr/ https://raw.githubusercontent.com/IDKiro/ssmgr-install/master/ss.yml
     sed -i "s#4000#${ssport}#g" /root/.ssmgr/ss.yml
@@ -368,26 +388,30 @@ set_ssmgr(){
     sed -i "s#passwd#${ssmgrpwd}#g" /root/.ssmgr/webgui.yml
 }
 
-set_ssmgr_startup(){
+set_ssmgr_startup()
+{
     pm2 --name "webgui" -f start ssmgr -x -- -c /root/.ssmgr/webgui.yml
     pm2 --name "ss" -f start ssmgr -x -- -c /root/.ssmgr/ss.yml -r libev:${shadowsockscipher}
     pm2 save
     pm2 startup
 }
 
-set_ssmgrt_startup(){
+set_ssmgrt_startup()
+{
     pm2 --name "ss" -f start /root/shadowsocks-manager-tiny/index.js -x -- 127.0.0.1:${ssport} 0.0.0.0:${mgrport} ${ssmgrpwd} libev:${shadowsockscipher}
     pm2 save
     pm2 startup
 }
 
-install_ssmgr(){
+install_ssmgr()
+{
     npm_install_ssmgr
     set_ssmgr
     set_ssmgr_startup
 }
 
-install_ssmgrt(){
+install_ssmgrt()
+{
     get_ssmgrt
     set_ssmgrt_startup
 }
