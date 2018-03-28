@@ -81,6 +81,14 @@ check_sys(){
     fi
 }
 
+getversion(){
+    if [[ -s /etc/redhat-release ]]; then
+        grep -oE  "[0-9.]+" /etc/redhat-release
+    else
+        grep -oE  "[0-9.]+" /etc/issue
+    fi
+}
+
 centosversion(){
     if check_sys sysRelease centos; then
         local code=$1
@@ -97,7 +105,7 @@ centosversion(){
 }
 
 check_centos7(){
-    if check_sys sysRelease centos; then
+    if check_sys sysRelease centos && centosversion 7; then
         return 0
     else
         echo -e "[${red}Error${plain}] The script only support CentOS 7."
