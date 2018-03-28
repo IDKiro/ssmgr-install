@@ -176,6 +176,15 @@ download_files()
     download "${mbedtls_file}-gpl.tgz" "${mbedtls_url}"
 }
 
+check_installed()
+{
+    if [ "$(command -v "$1")" ]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
 install_libsodium()
 {
     if [ ! -f /usr/lib/libsodium.a ]; then
@@ -215,17 +224,21 @@ install_shadowsocks()
     install_libsodium
     install_mbedtls
     ldconfig
-    cd ${cur_dir}
-    tar zxf ${shadowsocks_libev_ver}.tar.gz
-    cd ${shadowsocks_libev_ver}
-    ./configure --disable-documentation
-    make && make install
+    check_installed "ss-server"
+    if [ $? -eq 0 ]; then
+        echo -e "[${green}Info${plain}] Shadowsocks-libev has already been installed, nothing to do..."
+    else
+        cd ${cur_dir}
+        tar zxf ${shadowsocks_libev_ver}.tar.gz
+        cd ${shadowsocks_libev_ver}
+        ./configure --disable-documentation
+        make && make install
+    fi
     cd ${cur_dir}
     rm -rf ${shadowsocks_libev_ver} ${shadowsocks_libev_ver}.tar.gz
     rm -rf ${libsodium_file} ${libsodium_file}.tar.gz
     rm -rf ${mbedtls_file} ${mbedtls_file}-gpl.tgz
     clear
-
     echo "Shadowsocks-libev install completed"
 }
 
@@ -358,8 +371,19 @@ install_selected()
 
 install_nodejs()
 {
-	curl -sL https://rpm.nodesource.com/setup_6.x | bash -
-    yum install -y nodejs
+    check_installed "node"
+    if [ $? -eq 0 ]; then
+        node_ver=$(node -v | cut -b 2)
+        if [ ${node_ver} -eq 6 ]; then
+            echo -e "[${green}Info${plain}] nodejs v6 has already been installed, nothing to do..."
+        else
+            echo -e "[${red}Error${plain}] Other version nodejs has been installed..."
+            exit 1
+        fi
+    else
+        curl -sL https://rpm.nodesource.com/setup_6.x | bash -
+        yum install -y nodejs
+    fi
 }
 
 npm_install_ssmgr()
