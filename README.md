@@ -9,7 +9,7 @@
 **特性：**
 
 1. 管理面板安装完整版，节点安装tiny版，降低节点的安装内存要求
-2. 安装时可自定义加密方式、密码、端口
+2. 安装时可自定义加密方式、密码、端口、邮箱
 3. 自动配置开机自启
 
 ### 安装方法：
@@ -22,32 +22,11 @@ chmod +x ssmgr-install.sh
 ./ssmgr-install.sh
 ```
 
-为了正常使用管理面板，请编辑`/root/.ssmgr/webgui.yml`中的email配置
-
-普通SMTP：
-
-```
-email:
-    use: true
-    username: 'username'
-    password: 'password'    host: 'smtp.your-email.com'
-```
-
-mailgun：
-
-```
-email:
-    use: true
-    type: 'mailgun'
-    baseUrl: 'https://api.mailgun.net/v3/mg.xxxxx.xxx'
-    apiKey: 'key-xxxxxxxxxxxxx'
-```
-
 支付宝、图标等参照官方wiki配置
 
 [https://github.com/shadowsocks/shadowsocks-manager/wiki](https://github.com/shadowsocks/shadowsocks-manager/wiki)
 
 **TODO:**
 
-1. 提供安装时配置email的功能
+1. 安装时配置支付功能
 2. 其他系统支持

@@ -348,14 +348,14 @@ install_selected()
     while true
     do
     echo
-    echo "#############################################################"
-    echo "# One click Install shadowsocks-manager for CentOS 7        #"
-    echo "# Github: https://github.com/IDKiro/ssmgr-install           #"
-    echo "# Author: IDKiro                                            #"
-    echo "# Please choose the server you want                         #"
-    echo "# 1  shadowsocks-manager and node                           #"
-    echo "# 2  Only the node                                          #"
-    echo "#############################################################"
+    echo "###########################################################"
+    echo "# One click Install shadowsocks-manager for CentOS 7      #"
+    echo "# Github: https://github.com/IDKiro/ssmgr-install         #"
+    echo "# Author: IDKiro                                          #"
+    echo "# Please choose the server you want                       #"
+    echo "# 1  shadowsocks-manager and node                         #"
+    echo "# 2  Only the node                                        #"
+    echo "###########################################################"
     echo
     read -p "Please enter a number:" selected
     case "${selected}" in
@@ -412,6 +412,57 @@ set_ssmgr()
     sed -i "s#passwd#${ssmgrpwd}#g" /root/.ssmgr/webgui.yml
 }
 
+set_mailgun()
+{
+    echo "Please enter baseUrl of mailgun:"
+    read -p "(Example: https://api.mailgun.net/v3/mg.xxxxx.xxx):" mailgunurl
+    echo "Please enter apiKey of mailgun:"
+    read -p "(Example: key-xxxxxxxxxxxxx):" mailgunkey
+    sed -i "s#https://api.mailgun.net/v3/mg.xxxxx.xxx#${mailgunurl}#g" /root/.ssmgr/webgui.yml
+    sed -i "s#key-xxxxxxxxxxxxx#${mailgunkey}#g" /root/.ssmgr/webgui.yml
+}
+
+set_smtp()
+{
+    sed -i "s#type: 'mailgun'#username: 'username'#g" /root/.ssmgr/webgui.yml
+    sed -i "s#baseUrl: 'https://api.mailgun.net/v3/mg.xxxxx.xxx'#password: 'password'#g" /root/.ssmgr/webgui.yml
+    sed -i "s#apiKey: 'key-xxxxxxxxxxxxx'#host: 'smtp.your-email.com'#g" /root/.ssmgr/webgui.yml
+    read -p "Please enter host of SMTP:(smtp.your-email.com):" smtphost
+    read -p "Please enter username of your mail:" smtpusrname
+    read -p "Please enter password of your mail:" smtppasswd
+    sed -i "s#username#${smtpusrname}#g" /root/.ssmgr/webgui.yml
+    sed -i "s#password#${smtppasswd}#g" /root/.ssmgr/webgui.yml
+    sed -i "s#smtp.your-email.com#${smtphost}#g" /root/.ssmgr/webgui.yml
+}
+
+set_mail()
+{
+    while true
+    do
+    echo
+    echo "###############################################"
+    echo "# Please choose the mail server you want      #"
+    echo "# 1. mailgun                                  #"
+    echo "# 2. others                                   #"
+    echo "###############################################"
+    echo
+    read -p "Please enter a number:" mailselected
+    case "${mailselected}" in
+        1|2)
+        break
+        ;;
+        *)
+        echo -e "[${red}Error${plain}] Please only enter a number [1-2]"
+        ;;
+    esac
+    done
+    if [ "${mailselected}" == "1" ]; then
+        set_mailgun
+    else
+        set_smtp
+    fi
+}
+
 set_ssmgr_startup()
 {
     pm2 --name "webgui" -f start ssmgr -x -- -c /root/.ssmgr/webgui.yml
@@ -431,6 +482,7 @@ install_ssmgr()
 {
     npm_install_ssmgr
     set_ssmgr
+    set_mail
     set_ssmgr_startup
 }
 

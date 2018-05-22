@@ -22,10 +22,10 @@ plugins:
         gcmSenderId: ''
         gcmAPIKey: ''
     email:
-        use: false
+        use: true
         type: 'mailgun'
-        baseUrl: ''
-        apiKey: ''
+        baseUrl: 'https://api.mailgun.net/v3/mg.xxxxx.xxx'
+        apiKey: 'key-xxxxxxxxxxxxx'
     alipay:
         use: false
         appid: 
