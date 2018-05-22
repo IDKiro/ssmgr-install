@@ -242,6 +242,29 @@ install_shadowsocks()
     echo "Shadowsocks-libev install completed"
 }
 
+set_mailgun()
+{
+    echo "Please enter baseUrl of mailgun:"
+    read -p "(Example: https://api.mailgun.net/v3/mg.xxxxx.xxx):" mailgunurl
+    echo "Please enter apiKey of mailgun:"
+    read -p "(Example: key-xxxxxxxxxxxxx):" mailgunkey
+    sed -i "s#https://api.mailgun.net/v3/mg.xxxxx.xxx#${mailgunurl}#g" /root/.ssmgr/webgui.yml
+    sed -i "s#key-xxxxxxxxxxxxx#${mailgunkey}#g" /root/.ssmgr/webgui.yml
+}
+
+set_smtp()
+{
+    sed -i "s#type: 'mailgun'#username: 'username'#g" /root/.ssmgr/webgui.yml
+    sed -i "s#baseUrl: 'https://api.mailgun.net/v3/mg.xxxxx.xxx'#password: 'password'#g" /root/.ssmgr/webgui.yml
+    sed -i "s#apiKey: 'key-xxxxxxxxxxxxx'#host: 'smtp.your-email.com'#g" /root/.ssmgr/webgui.yml
+    read -p "Please enter host of SMTP:(smtp.your-email.com):" smtphost
+    read -p "Please enter username of your mail:" smtpusrname
+    read -p "Please enter password of your mail:" smtppasswd
+    sed -i "s#username#${smtpusrname}#g" /root/.ssmgr/webgui.yml
+    sed -i "s#password#${smtppasswd}#g" /root/.ssmgr/webgui.yml
+    sed -i "s#smtp.your-email.com#${smtphost}#g" /root/.ssmgr/webgui.yml
+}
+
 get_ip()
 {
     local IP=$( ip addr | egrep -o '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | egrep -v "^192\.168|^172\.1[6-9]\.|^172\.2[0-9]\.|^172\.3[0-2]\.|^10\.|^127\.|^255\.|^0\." | head -n 1 )
@@ -310,6 +333,33 @@ get_information()
     break
     done
 
+    while true
+    do
+    echo
+    echo "###############################################"
+    echo "# Please choose the mail server you want      #"
+    echo "# 1. mailgun                                  #"
+    echo "# 2. others                                   #"
+    echo "###############################################"
+    echo
+    read -p "Please enter a number:" mailselected
+    case "${mailselected}" in
+        1|2)
+        break
+        ;;
+        *)
+        echo -e "[${red}Error${plain}] Please only enter a number [1-2]"
+        ;;
+    esac
+    done
+    if [ "${mailselected}" == "1" ]; then
+        mailtype='mailgun'
+        set_mailgun
+    else
+        mailtype='others'
+        set_smtp
+    fi
+
     ipaddress="$(get_ip)"
 
     echo
@@ -319,6 +369,7 @@ get_information()
     echo -e "shadowsocks-libev port:    ${ssport}"
     echo -e "shadowsocks-manager port:  ${mgrport}"
     echo -e "cipher:                    ${shadowsockscipher}"
+    echo -e "mail server type:          ${mailtype}"
     echo "-----------------------------------------------------"
     echo
 }
@@ -412,57 +463,6 @@ set_ssmgr()
     sed -i "s#passwd#${ssmgrpwd}#g" /root/.ssmgr/webgui.yml
 }
 
-set_mailgun()
-{
-    echo "Please enter baseUrl of mailgun:"
-    read -p "(Example: https://api.mailgun.net/v3/mg.xxxxx.xxx):" mailgunurl
-    echo "Please enter apiKey of mailgun:"
-    read -p "(Example: key-xxxxxxxxxxxxx):" mailgunkey
-    sed -i "s#https://api.mailgun.net/v3/mg.xxxxx.xxx#${mailgunurl}#g" /root/.ssmgr/webgui.yml
-    sed -i "s#key-xxxxxxxxxxxxx#${mailgunkey}#g" /root/.ssmgr/webgui.yml
-}
-
-set_smtp()
-{
-    sed -i "s#type: 'mailgun'#username: 'username'#g" /root/.ssmgr/webgui.yml
-    sed -i "s#baseUrl: 'https://api.mailgun.net/v3/mg.xxxxx.xxx'#password: 'password'#g" /root/.ssmgr/webgui.yml
-    sed -i "s#apiKey: 'key-xxxxxxxxxxxxx'#host: 'smtp.your-email.com'#g" /root/.ssmgr/webgui.yml
-    read -p "Please enter host of SMTP:(smtp.your-email.com):" smtphost
-    read -p "Please enter username of your mail:" smtpusrname
-    read -p "Please enter password of your mail:" smtppasswd
-    sed -i "s#username#${smtpusrname}#g" /root/.ssmgr/webgui.yml
-    sed -i "s#password#${smtppasswd}#g" /root/.ssmgr/webgui.yml
-    sed -i "s#smtp.your-email.com#${smtphost}#g" /root/.ssmgr/webgui.yml
-}
-
-set_mail()
-{
-    while true
-    do
-    echo
-    echo "###############################################"
-    echo "# Please choose the mail server you want      #"
-    echo "# 1. mailgun                                  #"
-    echo "# 2. others                                   #"
-    echo "###############################################"
-    echo
-    read -p "Please enter a number:" mailselected
-    case "${mailselected}" in
-        1|2)
-        break
-        ;;
-        *)
-        echo -e "[${red}Error${plain}] Please only enter a number [1-2]"
-        ;;
-    esac
-    done
-    if [ "${mailselected}" == "1" ]; then
-        set_mailgun
-    else
-        set_smtp
-    fi
-}
-
 set_ssmgr_startup()
 {
     pm2 --name "webgui" -f start ssmgr -x -- -c /root/.ssmgr/webgui.yml
@@ -482,7 +482,6 @@ install_ssmgr()
 {
     npm_install_ssmgr
     set_ssmgr
-    set_mail
     set_ssmgr_startup
 }
 
