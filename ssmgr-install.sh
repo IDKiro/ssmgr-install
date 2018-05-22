@@ -441,8 +441,8 @@ set_mail()
     do
     echo
     echo "###############################################"
-    echo "# Everything almost completed                 #"
-    echo "# Please choose the mail server you want      #"
+    echo "# Everything almost completed!                #"
+    echo "# Please choose the mail server you want:     #"
     echo "# 1. mailgun                                  #"
     echo "# 2. others                                   #"
     echo "###############################################"
