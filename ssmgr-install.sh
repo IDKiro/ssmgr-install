@@ -310,34 +310,7 @@ get_information()
     break
     done
 
-    while true
-    do
-
-    echo "Please choose the mail server you want"
-    echo "1. mailgun"
-    echo "2. others"
-    read -p "Please enter a number:" mailselected
-    case "${mailselected}" in
-        1|2)
-        break
-        ;;
-        *)
-        echo -e "[${red}Error${plain}] Please only enter a number [1-2]"
-        ;;
-    esac
-    done
-    if [ "${mailselected}" == "1" ]; then
-        mailtype='mailgun'
-    else
-        mailtype='others'
-    fi
-
     ipaddress="$(get_ip)"
-
-    mkdir /root/.ssmgr
-    wget -N -P  /root/.ssmgr/ https://raw.githubusercontent.com/IDKiro/ssmgr-install/master/ss.yml
-    wget -N -P  /root/.ssmgr/ https://raw.githubusercontent.com/IDKiro/ssmgr-install/master/webgui.yml
-    set_ssmgr
 
     echo
     echo "-----------------------------------------------------"
@@ -346,9 +319,8 @@ get_information()
     echo -e "shadowsocks-libev port:    ${ssport}"
     echo -e "shadowsocks-manager port:  ${mgrport}"
     echo -e "cipher:                    ${shadowsockscipher}"
-    echo -e "mail server type:          ${mailtype}"
     echo "-----------------------------------------------------"
-    echo 
+    echo
 }
 
 firewall_set()
@@ -427,6 +399,19 @@ get_ssmgrt()
     npm i -g pm2
 }
 
+set_ssmgr()
+{
+    mkdir /root/.ssmgr
+    wget -N -P  /root/.ssmgr/ https://raw.githubusercontent.com/IDKiro/ssmgr-install/master/ss.yml
+    sed -i "s#4000#${ssport}#g" /root/.ssmgr/ss.yml
+    sed -i "s#4001#${mgrport}#g" /root/.ssmgr/ss.yml
+    sed -i "s#passwd#${ssmgrpwd}#g" /root/.ssmgr/ss.yml
+    wget -N -P  /root/.ssmgr/ https://raw.githubusercontent.com/IDKiro/ssmgr-install/master/webgui.yml
+    sed -i "s#12.34.56.78#${ipaddress}#g" /root/.ssmgr/webgui.yml
+    sed -i "s#4000#${ssport}#g" /root/.ssmgr/webgui.yml
+    sed -i "s#passwd#${ssmgrpwd}#g" /root/.ssmgr/webgui.yml
+}
+
 set_mailgun()
 {
     echo "Please enter baseUrl of mailgun:"
@@ -450,14 +435,28 @@ set_smtp()
     sed -i "s#smtp.your-email.com#${smtphost}#g" /root/.ssmgr/webgui.yml
 }
 
-set_ssmgr()
+set_mail()
 {
-    sed -i "s#4000#${ssport}#g" /root/.ssmgr/ss.yml
-    sed -i "s#4001#${mgrport}#g" /root/.ssmgr/ss.yml
-    sed -i "s#passwd#${ssmgrpwd}#g" /root/.ssmgr/ss.yml
-    sed -i "s#12.34.56.78#${ipaddress}#g" /root/.ssmgr/webgui.yml
-    sed -i "s#4000#${ssport}#g" /root/.ssmgr/webgui.yml
-    sed -i "s#passwd#${ssmgrpwd}#g" /root/.ssmgr/webgui.yml
+    while true
+    do
+    echo
+    echo "###############################################"
+    echo "# Everything almost completed                 #"
+    echo "# Please choose the mail server you want      #"
+    echo "# 1. mailgun                                  #"
+    echo "# 2. others                                   #"
+    echo "###############################################"
+    echo
+    read -p "Please enter a number:" mailselected
+    case "${mailselected}" in
+        1|2)
+        break
+        ;;
+        *)
+        echo -e "[${red}Error${plain}] Please only enter a number [1-2]"
+        ;;
+    esac
+    done
     if [ "${mailselected}" == "1" ]; then
         set_mailgun
     else
@@ -483,6 +482,8 @@ set_ssmgrt_startup()
 install_ssmgr()
 {
     npm_install_ssmgr
+    set_ssmgr
+    set_mail
     set_ssmgr_startup
 }
 
