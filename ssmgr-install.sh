@@ -424,12 +424,13 @@ set_mailgun()
 
 set_smtp()
 {
-    sed -i "s#type: 'mailgun'#username: 'username'#g" /root/.ssmgr/webgui.yml
-    sed -i "s#baseUrl: 'https://api.mailgun.net/v3/mg.xxxxx.xxx'#password: 'password'#g" /root/.ssmgr/webgui.yml
-    sed -i "s#apiKey: 'key-xxxxxxxxxxxxx'#host: 'smtp.your-email.com'#g" /root/.ssmgr/webgui.yml
+    sed -i "s#type: 'mailgun'#type: 'smtp'#g" /root/.ssmgr/webgui.yml
+    sed -i "s#baseUrl: 'https://api.mailgun.net/v3/mg.xxxxx.xxx'#username: 'username'#g" /root/.ssmgr/webgui.yml
+    sed -i "s#apiKey: 'key-xxxxxxxxxxxxx'#password: 'password'#g" /root/.ssmgr/webgui.yml
+    sed -i 'N;28a\\t\thost: 'smtp.your-email.com'' /root/.ssmgr/webgui.yml
     read -p "Please enter host of SMTP:(smtp.your-email.com):" smtphost
-    read -p "Please enter username of your mail:" smtpusrname
-    read -p "Please enter password of your mail:" smtppasswd
+    read -p "Please enter username of your email:" smtpusrname
+    read -p "Please enter password of your email:" smtppasswd
     sed -i "s#username#${smtpusrname}#g" /root/.ssmgr/webgui.yml
     sed -i "s#password#${smtppasswd}#g" /root/.ssmgr/webgui.yml
     sed -i "s#smtp.your-email.com#${smtphost}#g" /root/.ssmgr/webgui.yml
@@ -442,7 +443,7 @@ set_mail()
     echo
     echo "###############################################"
     echo "# Everything almost completed!                #"
-    echo "# Please choose the mail server you want:     #"
+    echo "# Please choose the email server you want:     #"
     echo "# 1. mailgun                                  #"
     echo "# 2. others                                   #"
     echo "###############################################"
