@@ -336,6 +336,8 @@ firewall_set()
             iptables -I INPUT -m state --state NEW -m tcp -p tcp --dport ${mgrport} -j ACCEPT
             iptables -I INPUT -m state --state NEW -m udp -p udp --dport ${mgrport} -j ACCEPT
             iptables -I INPUT -m state --state NEW -m tcp -p tcp --dport 80 -j ACCEPT
+            iptables -I INPUT -m state --state NEW -m udp -p udp --dport 80 -j ACCEPT
+            iptables -I INPUT -m state --state NEW -m tcp -p tcp --dport 50000:60000 -j ACCEPT
             iptables -I INPUT -m state --state NEW -m udp -p udp --dport 50000:60000 -j ACCEPT
             /etc/init.d/iptables save
             /etc/init.d/iptables restart
