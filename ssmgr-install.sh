@@ -357,7 +357,7 @@ firewall_set()
             firewall-cmd --permanent --zone=public --add-port=50000-60000/udp
             firewall-cmd --reload
         else
-            echo -e "[${yellow}Warning${plain}] firewalld looks like not running or not installed."
+            echo -e "[${yellow}Warning${plain}] firewall looks like not running or not installed."
             echo -e "[${yellow}Warning${plain}] If you use iptables, you may need to change it's setting."
         fi
     fi
