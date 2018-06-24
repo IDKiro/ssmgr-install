@@ -107,12 +107,15 @@ centosversion()
     fi
 }
 
-check_centos7()
+check_centos()
 {
-    if check_sys sysRelease centos && centosversion 7; then
-        return 0
+    if check_sys sysRelease centos; then
+        if centosversion 5; then
+            echo -e "[${red}Error${plain}] The script don't support CentOS 5."
+            exit 1
+        fi
     else
-        echo -e "[${red}Error${plain}] The script only support CentOS 7."
+        echo -e "[${red}Error${plain}] The script only support CentOS."
         exit 1
     fi
 }
@@ -325,20 +328,36 @@ get_information()
 
 firewall_set()
 {
-    systemctl status firewalld > /dev/null 2>&1
-    if [ $? -eq 0 ]; then
-        firewall-cmd --permanent --zone=public --add-port=${ssport}/tcp
-        firewall-cmd --permanent --zone=public --add-port=${ssport}/udp
-        firewall-cmd --permanent --zone=public --add-port=${mgrport}/tcp
-        firewall-cmd --permanent --zone=public --add-port=${mgrport}/udp
-        firewall-cmd --permanent --zone=public --add-port=80/tcp
-        firewall-cmd --permanent --zone=public --add-port=80/udp
-        firewall-cmd --permanent --zone=public --add-port=50000-60000/tcp
-        firewall-cmd --permanent --zone=public --add-port=50000-60000/udp
-        firewall-cmd --reload
-    else
-        echo -e "[${yellow}Warning${plain}] firewalld looks like not running or not installed."
-        echo -e "[${yellow}Warning${plain}] If you use iptables, you may need to change it's setting."
+    if centosversion 6; then
+        /etc/init.d/iptables status > /dev/null 2>&1
+        if [ $? -eq 0 ]; then
+            iptables -I INPUT -m state --state NEW -m tcp -p tcp --dport ${ssport} -j ACCEPT
+            iptables -I INPUT -m state --state NEW -m udp -p udp --dport ${ssport} -j ACCEPT
+            iptables -I INPUT -m state --state NEW -m tcp -p tcp --dport ${mgrport} -j ACCEPT
+            iptables -I INPUT -m state --state NEW -m udp -p udp --dport ${mgrport} -j ACCEPT
+            iptables -I INPUT -m state --state NEW -m tcp -p tcp --dport 80 -j ACCEPT
+            iptables -I INPUT -m state --state NEW -m udp -p udp --dport 50000:60000 -j ACCEPT
+            /etc/init.d/iptables save
+            /etc/init.d/iptables restart
+        else
+            echo -e "[${yellow}Warning${plain}] iptables looks like shutdown or not installed."
+        fi
+    elif centosversion 7; then
+        systemctl status firewalld > /dev/null 2>&1
+        if [ $? -eq 0 ]; then
+            firewall-cmd --permanent --zone=public --add-port=${ssport}/tcp
+            firewall-cmd --permanent --zone=public --add-port=${ssport}/udp
+            firewall-cmd --permanent --zone=public --add-port=${mgrport}/tcp
+            firewall-cmd --permanent --zone=public --add-port=${mgrport}/udp
+            firewall-cmd --permanent --zone=public --add-port=80/tcp
+            firewall-cmd --permanent --zone=public --add-port=80/udp
+            firewall-cmd --permanent --zone=public --add-port=50000-60000/tcp
+            firewall-cmd --permanent --zone=public --add-port=50000-60000/udp
+            firewall-cmd --reload
+        else
+            echo -e "[${yellow}Warning${plain}] firewalld looks like not running or not installed."
+            echo -e "[${yellow}Warning${plain}] If you use iptables, you may need to change it's setting."
+        fi
     fi
     echo -e "[${green}Info${plain}] firewall set completed..."
 }
@@ -349,7 +368,7 @@ install_selected()
     do
     echo
     echo "###########################################################"
-    echo "# One click Install shadowsocks-manager for CentOS 7      #"
+    echo "# One click Install shadowsocks-manager for CentOS        #"
     echo "# Github: https://github.com/IDKiro/ssmgr-install         #"
     echo "# Author: IDKiro                                          #"
     echo "# Please choose the server you want                       #"
@@ -495,7 +514,7 @@ install_ssmgrt()
 }
 
 # Installation start
-check_centos7
+check_centos
 install_selected
 get_information
 disable_selinux

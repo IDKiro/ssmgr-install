@@ -1,6 +1,6 @@
 # shadowsocks-manager 一键安装脚本
 
-系统要求：CentOS 7
+系统要求：CentOS
 
 内存要求：管理面板≥1G，节点≥256M
 
