@@ -407,7 +407,10 @@ install_nodejs()
 
 npm_install_ssmgr()
 {
-	npm i -g shadowsocks-manager
+    cd /root
+    git clone https://github.com/shadowsocks/shadowsocks-manager.git
+    cd shadowsocks-manager
+    npm i
     npm i -g pm2
 }
 
@@ -486,8 +489,8 @@ set_mail()
 
 set_ssmgr_startup()
 {
-    pm2 --name "webgui" -f start ssmgr -x -- -c /root/.ssmgr/webgui.yml
-    pm2 --name "ss" -f start ssmgr -x -- -c /root/.ssmgr/ss.yml -r libev:${shadowsockscipher}
+    pm2 --name "webgui" -f start /root/shadowsocks-manager/server.js -x -- -c /root/.ssmgr/webgui.yml
+    pm2 --name "ss" -f start /root/shadowsocks-manager/server.js -x -- -c /root/.ssmgr/ss.yml -r libev:${shadowsockscipher}
     pm2 save
     pm2 startup
 }
