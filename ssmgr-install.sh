@@ -499,7 +499,7 @@ set_ssmgr_startup()
 
 set_ssmgrt_startup()
 {
-    pm2 --name "ss" -f start /root/shadowsocks-manager-tiny/index.js -x -- 127.0.0.1:${ssport} 0.0.0.0:${mgrport} ${ssmgrpwd} libev:${shadowsockscipher}
+    pm2 --name "ss" -f start /root/shadowsocks-manager-tiny/index.js 127.0.0.1:${ssport} 0.0.0.0:${mgrport} ${ssmgrpwd} libev:${shadowsockscipher}
     pm2 save
     pm2 startup
 }
