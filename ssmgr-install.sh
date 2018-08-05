@@ -410,7 +410,7 @@ install_nodejs()
 npm_install_ssmgr()
 {
     cd /root
-    git clone https://github.com/shadowsocks/shadowsocks-manager.git
+    git clone https://github.com/IDKiro/shadowsocks-manager.git
     cd shadowsocks-manager
     npm i
     npm i -g pm2
@@ -419,7 +419,7 @@ npm_install_ssmgr()
 get_ssmgrt()
 {
     cd /root
-    git clone https://github.com/gyteng/shadowsocks-manager-tiny.git
+    git clone https://github.com/IDKiro/shadowsocks-manager-tiny.git
     npm i -g pm2
 }
 
