@@ -395,14 +395,14 @@ install_nodejs()
     check_installed "node"
     if [ $? -eq 0 ]; then
         node_ver=$(node -v | cut -b 2)
-        if [ ${node_ver} -eq 6 ]; then
-            echo -e "[${green}Info${plain}] nodejs v6 has already been installed, nothing to do..."
+        if [ ${node_ver} -eq 8 ]; then
+            echo -e "[${green}Info${plain}] nodejs v8 has already been installed, nothing to do..."
         else
             echo -e "[${red}Error${plain}] Other version nodejs has been installed..."
             exit 1
         fi
     else
-        curl -sL https://rpm.nodesource.com/setup_6.x | bash -
+        curl -sL https://rpm.nodesource.com/setup_8.x | bash -
         yum install -y nodejs
     fi
 }
