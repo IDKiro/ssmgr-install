@@ -149,6 +149,7 @@ pre_install()
     fi
     echo -e "[${green}Info${plain}] Checking the EPEL repository complete..."
     yum install -y -q unzip openssl openssl-devel gettext gcc autoconf libtool automake make asciidoc xmlto libev-devel pcre pcre-devel git c-ares-devel
+    yum update nss curl
 }
 
 download()
@@ -341,6 +342,8 @@ firewall_set()
             iptables -I INPUT -m state --state NEW -m udp -p udp --dport 50000:60000 -j ACCEPT
             /etc/init.d/iptables save
             /etc/init.d/iptables restart
+            echo -e "[${green}Info${plain}] Set up the iptables successfully."
+            
         else
             echo -e "[${yellow}Warning${plain}] iptables looks like shutdown or not installed."
         fi
@@ -356,6 +359,7 @@ firewall_set()
             firewall-cmd --permanent --zone=public --add-port=50000-60000/tcp
             firewall-cmd --permanent --zone=public --add-port=50000-60000/udp
             firewall-cmd --reload
+            echo -e "[${green}Info${plain}] Set up the firewall successfully."
         else
             echo -e "[${yellow}Warning${plain}] firewall looks like not running or not installed."
             echo -e "[${yellow}Warning${plain}] If you use iptables, you may need to change it's setting."
