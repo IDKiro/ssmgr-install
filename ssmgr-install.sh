@@ -149,7 +149,7 @@ pre_install()
     fi
     echo -e "[${green}Info${plain}] Checking the EPEL repository complete..."
     yum install -y -q unzip openssl openssl-devel gettext gcc autoconf libtool automake make asciidoc xmlto libev-devel pcre pcre-devel git c-ares-devel
-    yum update nss curl
+    yum update -y nss curl
 }
 
 download()
