@@ -343,7 +343,6 @@ firewall_set()
             /etc/init.d/iptables save
             /etc/init.d/iptables restart
             echo -e "[${green}Info${plain}] Set up the iptables successfully."
-            
         else
             echo -e "[${yellow}Warning${plain}] iptables looks like shutdown or not installed."
         fi
