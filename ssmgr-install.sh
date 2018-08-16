@@ -258,14 +258,14 @@ get_information()
 {
     # Set shadowsocks-manager password
     echo "Please enter password of shadowsocks-manager:"
-    read -p "(Default password: 123456):" ssmgrpwd
+    stty erase '^H' && read -p "(Default password: 123456):" ssmgrpwd
     [ -z "${ssmgrpwd}" ] && ssmgrpwd="123456"
 
     # Set shadowsocks-libev config port
     while true
     do
     echo -e "Please enter a port for shadowsocks-libev [1-65535]"
-    read -p "(Default port: 4000):" ssport
+    stty erase '^H' && read -p "(Default port: 4000):" ssport
     [ -z "$ssport" ] && ssport=4000
     expr ${ssport} + 1 &>/dev/null
     if [ $? -eq 0 ]; then
@@ -280,7 +280,7 @@ get_information()
     while true
     do
     echo -e "Please enter a port for shadowsocks-manager [1-65535]"
-    read -p "(Default port: 4001):" mgrport
+    stty erase '^H' && read -p "(Default port: 4001):" mgrport
     [ -z "$mgrport" ] && mgrport=4001
     expr ${mgrport} + 1 &>/dev/null
     if [ $? -eq 0 ]; then
@@ -299,7 +299,7 @@ get_information()
         hint="${ciphers[$i-1]}"
         echo -e "${green}${i}${plain}) ${hint}"
     done
-    read -p "Which cipher you'd select(Default: ${ciphers[0]}):" pick
+    stty erase '^H' && read -p "Which cipher you'd select(Default: ${ciphers[0]}):" pick
     [ -z "$pick" ] && pick=1
     expr ${pick} + 1 &>/dev/null
     if [ $? -ne 0 ]; then
@@ -369,6 +369,7 @@ firewall_set()
 
 install_selected()
 {
+    clear
     while true
     do
     echo
@@ -377,17 +378,18 @@ install_selected()
     echo "# Github: https://github.com/IDKiro/ssmgr-install         #"
     echo "# Author: IDKiro                                          #"
     echo "# Please choose the server you want                       #"
-    echo "# 1  shadowsocks-manager and node                         #"
-    echo "# 2  Only the node                                        #"
+    echo "# 1. shadowsocks-manager and node                         #"
+    echo "# 2. Only the node                                        #"
+    echo "# 3. Enable the BBRmod                                    #"
     echo "###########################################################"
     echo
-    read -p "Please enter a number:" selected
+    stty erase '^H' && read -p "Please enter a number:" selected
     case "${selected}" in
-        1|2)
+        1|2|3)
         break
         ;;
         *)
-        echo -e "[${red}Error${plain}] Please only enter a number [1-2]"
+        echo -e "[${red}Error${plain}] Please only enter a number [1-3]"
         ;;
     esac
     done
@@ -442,9 +444,9 @@ set_ssmgr()
 set_mailgun()
 {
     echo "Please enter baseUrl of mailgun:"
-    read -p "(Example: https://api.mailgun.net/v3/mg.xxxxx.xxx):" mailgunurl
+    stty erase '^H' && read -p "(Example: https://api.mailgun.net/v3/mg.xxxxx.xxx):" mailgunurl
     echo "Please enter apiKey of mailgun:"
-    read -p "(Example: key-xxxxxxxxxxxxx):" mailgunkey
+    stty erase '^H' && read -p "(Example: key-xxxxxxxxxxxxx):" mailgunkey
     sed -i "s#https://api.mailgun.net/v3/mg.xxxxx.xxx#${mailgunurl}#g" /root/.ssmgr/webgui.yml
     sed -i "s#key-xxxxxxxxxxxxx#${mailgunkey}#g" /root/.ssmgr/webgui.yml
 }
@@ -455,9 +457,9 @@ set_smtp()
     sed -i "s#baseUrl: 'https://api.mailgun.net/v3/mg.xxxxx.xxx'#username: 'username'#g" /root/.ssmgr/webgui.yml
     sed -i "s#apiKey: 'key-xxxxxxxxxxxxx'#password: 'password'#g" /root/.ssmgr/webgui.yml
     sed -i 'N;28a\\t\thost: 'smtp.your-email.com'' /root/.ssmgr/webgui.yml
-    read -p "Please enter host of SMTP:(smtp.your-email.com):" smtphost
-    read -p "Please enter username of your email:" smtpusrname
-    read -p "Please enter password of your email:" smtppasswd
+    stty erase '^H' && read -p "Please enter host of SMTP:(smtp.your-email.com):" smtphost
+    stty erase '^H' && read -p "Please enter username of your email:" smtpusrname
+    stty erase '^H' && read -p "Please enter password of your email:" smtppasswd
     sed -i "s#username#${smtpusrname}#g" /root/.ssmgr/webgui.yml
     sed -i "s#password#${smtppasswd}#g" /root/.ssmgr/webgui.yml
     sed -i "s#smtp.your-email.com#${smtphost}#g" /root/.ssmgr/webgui.yml
@@ -465,6 +467,7 @@ set_smtp()
 
 set_mail()
 {
+    clear
     while true
     do
     echo
@@ -475,7 +478,7 @@ set_mail()
     echo "# 2. others                                   #"
     echo "###############################################"
     echo
-    read -p "Please enter a number:" mailselected
+    stty erase '^H' && read -p "Please enter a number:" mailselected
     case "${mailselected}" in
         1|2)
         break
@@ -521,9 +524,140 @@ install_ssmgrt()
     set_ssmgrt_startup
 }
 
+detele_kernel()
+{
+    rpm_total=`rpm -qa | grep kernel | grep -v "4.11.8" | grep -v "noarch" | wc -l`
+    if [ "${rpm_total}" > "1" ]; then
+        for((integer = 1; integer <= ${rpm_total}; integer++)); do
+            rpm_del=`rpm -qa | grep kernel | grep -v "4.11.8" | grep -v "noarch" | head -${integer}`
+            yum remove -y ${rpm_del}
+        done
+        echo -e "[${green}Info${plain}] Successfully removed the kernel!"
+    else
+        echo -e "[${red}Error${plain}] Failed to remove the kernel..." && exit 1
+    fi
+}
+
+BBR_grub()
+{
+    if centosversion 6; then
+        if [ ! -f "/boot/grub/grub.conf" ]; then
+            echo -e "[${red}Error${plain}] Can not find the file: /boot/grub/grub.conf"
+            exit 1
+        fi
+        sed -i 's/^default=.*/default=0/g' /boot/grub/grub.conf
+    elif centosversion 7; then
+        if [ ! -f "/boot/grub2/grub.cfg" ]; then
+            echo -e "[${red}Error${plain}] Can not find the file: /boot/grub2/grub.cfg"
+            exit 1
+        fi
+        grub2-set-default 0
+    fi
+}
+
+install_bbr()
+{
+    if centosversion 6; then
+        rpm --import http://raw.githubusercontent.com/IDKiro/ssmgr-install/master/bbr/RPM-GPG-KEY-elrepo.org
+        yum install -y http://raw.githubusercontent.com/IDKiro/ssmgr-install/master/bbr/centos6/kernel-ml-4.11.8.rpm
+        yum remove -y kernel-headers
+        yum install -y http://raw.githubusercontent.com/IDKiro/ssmgr-install/master/bbr/centos6/kernel-ml-headers-4.11.8.rpm
+        yum install -y http://raw.githubusercontent.com/IDKiro/ssmgr-install/master/bbr/centos6/kernel-ml-devel-4.11.8.rpm
+    elif centosversion 7; then
+        rpm --import http://raw.githubusercontent.com/IDKiro/ssmgr-install/master/bbr/RPM-GPG-KEY-elrepo.org
+        yum install -y http://raw.githubusercontent.com/IDKiro/ssmgr-install/master/bbr/centos7/kernel-ml-4.11.8.rpm
+        yum remove -y kernel-headers
+        yum install -y http://raw.githubusercontent.com/IDKiro/ssmgr-install/master/bbr/centos7/kernel-ml-headers-4.11.8.rpm
+        yum install -y http://raw.githubusercontent.com/IDKiro/ssmgr-install/master/bbr/centos7/kernel-ml-devel-4.11.8.rpm
+    fi
+
+    detele_kernel
+	BBR_grub
+	echo -e "[${green}Info${plain}] Now you need to reboot to make the bbr work."
+	stty erase '^H' && read -p "[${green}Info${plain}] Do you like to reboot right now? [Y/n] :" yn
+	[ -z "${yn}" ] && yn="y"
+	if [[ $yn == [Yy] ]]; then
+		echo -e "${Info} Rebooting..."
+		reboot
+	fi
+}
+
+check_bbr()
+{
+    stty erase '^H' && read -p "Do you like to install the BBRmod?[Y/n]:" yn
+    [ -z "$yn" ] && yn="y"
+    if [[ $yn == [Yy] ]]; then
+        echo -e "[${green}Info${plain}] Start installing the BBRmod..."
+        install_bbr
+    fi
+}
+
+remove_all()
+{
+	sed -i '/net.core.default_qdisc/d' /etc/sysctl.conf
+    sed -i '/net.ipv4.tcp_congestion_control/d' /etc/sysctl.conf
+    sed -i '/fs.file-max/d' /etc/sysctl.conf
+	sed -i '/net.core.rmem_max/d' /etc/sysctl.conf
+	sed -i '/net.core.wmem_max/d' /etc/sysctl.conf
+	sed -i '/net.core.rmem_default/d' /etc/sysctl.conf
+	sed -i '/net.core.wmem_default/d' /etc/sysctl.conf
+	sed -i '/net.core.netdev_max_backlog/d' /etc/sysctl.conf
+	sed -i '/net.core.somaxconn/d' /etc/sysctl.conf
+	sed -i '/net.ipv4.tcp_syncookies/d' /etc/sysctl.conf
+	sed -i '/net.ipv4.tcp_tw_reuse/d' /etc/sysctl.conf
+	sed -i '/net.ipv4.tcp_tw_recycle/d' /etc/sysctl.conf
+	sed -i '/net.ipv4.tcp_fin_timeout/d' /etc/sysctl.conf
+	sed -i '/net.ipv4.tcp_keepalive_time/d' /etc/sysctl.conf
+	sed -i '/net.ipv4.ip_local_port_range/d' /etc/sysctl.conf
+	sed -i '/net.ipv4.tcp_max_syn_backlog/d' /etc/sysctl.conf
+	sed -i '/net.ipv4.tcp_max_tw_buckets/d' /etc/sysctl.conf
+	sed -i '/net.ipv4.tcp_rmem/d' /etc/sysctl.conf
+	sed -i '/net.ipv4.tcp_wmem/d' /etc/sysctl.conf
+	sed -i '/net.ipv4.tcp_mtu_probing/d' /etc/sysctl.conf
+	sed -i '/net.ipv4.ip_forward/d' /etc/sysctl.conf
+	sed -i '/fs.inotify.max_user_instances/d' /etc/sysctl.conf
+	sed -i '/net.ipv4.tcp_syncookies/d' /etc/sysctl.conf
+	sed -i '/net.ipv4.tcp_fin_timeout/d' /etc/sysctl.conf
+	sed -i '/net.ipv4.tcp_tw_reuse/d' /etc/sysctl.conf
+	sed -i '/net.ipv4.tcp_max_syn_backlog/d' /etc/sysctl.conf
+	sed -i '/net.ipv4.ip_local_port_range/d' /etc/sysctl.conf
+	sed -i '/net.ipv4.tcp_max_tw_buckets/d' /etc/sysctl.conf
+	sed -i '/net.ipv4.route.gc_timeout/d' /etc/sysctl.conf
+	sed -i '/net.ipv4.tcp_synack_retries/d' /etc/sysctl.conf
+	sed -i '/net.ipv4.tcp_syn_retries/d' /etc/sysctl.conf
+	sed -i '/net.core.somaxconn/d' /etc/sysctl.conf
+	sed -i '/net.core.netdev_max_backlog/d' /etc/sysctl.conf
+	sed -i '/net.ipv4.tcp_timestamps/d' /etc/sysctl.conf
+	sed -i '/net.ipv4.tcp_max_orphans/d' /etc/sysctl.conf
+	sleep 1s
+}
+
+startbbrmod()
+{
+	remove_all
+    mkdir bbrmod && cd bbrmod
+    wget -N --no-check-certificate http://raw.githubusercontent.com/IDKiro/ssmgr-install/master/bbr/tcp_tsunami.c
+    echo "obj-m:=tcp_tsunami.o" > Makefile
+    make -C /lib/modules/$(uname -r)/build M=`pwd` modules CC=/usr/bin/gcc
+    chmod +x ./tcp_tsunami.ko
+    cp -rf ./tcp_tsunami.ko /lib/modules/$(uname -r)/kernel/net/ipv4
+    insmod tcp_tsunami.ko
+    depmod -a
+
+	echo "net.core.default_qdisc=fq" >> /etc/sysctl.conf
+	echo "net.ipv4.tcp_congestion_control=tsunami" >> /etc/sysctl.conf
+	sysctl -p
+    cd .. && rm -rf bbrmod
+	echo -e "[${green}Info${plain}] Successfully ran the BBRmod!" && exit 0
+}
+
+
 # Installation start
 check_centos
 install_selected
+if [ "${selected}" == "3" ]; then
+    startbbrmod 
+fi
 get_information
 disable_selinux
 pre_install
@@ -533,9 +667,12 @@ firewall_set
 install_nodejs
 if [ "${selected}" == "1" ]; then
     install_ssmgr
-else
+elif [ "${selected}" == "2" ]; then
     install_ssmgrt
 fi
+check_bbr
+
+clear
 
 echo "#############################################################"
 echo "# Install shadowsocks-manager  Success                      #"
