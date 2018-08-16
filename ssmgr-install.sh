@@ -257,15 +257,15 @@ get_ip()
 get_information()
 {
     # Set shadowsocks-manager password
-    echo "Please enter password of shadowsocks-manager:"
-    stty erase '^H' && read -p "(Default password: 123456):" ssmgrpwd
+    echo "Please enter password of shadowsocks-manager: "
+    stty erase '^H' && read -p "(Default password: 123456): " ssmgrpwd
     [ -z "${ssmgrpwd}" ] && ssmgrpwd="123456"
 
     # Set shadowsocks-libev config port
     while true
     do
     echo -e "Please enter a port for shadowsocks-libev [1-65535]"
-    stty erase '^H' && read -p "(Default port: 4000):" ssport
+    stty erase '^H' && read -p "(Default port: 4000): " ssport
     [ -z "$ssport" ] && ssport=4000
     expr ${ssport} + 1 &>/dev/null
     if [ $? -eq 0 ]; then
@@ -280,7 +280,7 @@ get_information()
     while true
     do
     echo -e "Please enter a port for shadowsocks-manager [1-65535]"
-    stty erase '^H' && read -p "(Default port: 4001):" mgrport
+    stty erase '^H' && read -p "(Default port: 4001): " mgrport
     [ -z "$mgrport" ] && mgrport=4001
     expr ${mgrport} + 1 &>/dev/null
     if [ $? -eq 0 ]; then
@@ -294,12 +294,12 @@ get_information()
     # Set shadowsocks config stream ciphers
     while true
     do
-    echo -e "Please select stream cipher for shadowsocks-libev:"
+    echo -e "Please select stream cipher for shadowsocks-libev: "
     for ((i=1;i<=${#ciphers[@]};i++ )); do
         hint="${ciphers[$i-1]}"
         echo -e "${green}${i}${plain}) ${hint}"
     done
-    stty erase '^H' && read -p "Which cipher you'd select(Default: ${ciphers[0]}):" pick
+    stty erase '^H' && read -p "Which cipher you'd select(Default: ${ciphers[0]}): " pick
     [ -z "$pick" ] && pick=1
     expr ${pick} + 1 &>/dev/null
     if [ $? -ne 0 ]; then
@@ -383,7 +383,7 @@ install_selected()
     echo "# 3. Enable the BBRmod                                    #"
     echo "###########################################################"
     echo
-    stty erase '^H' && read -p "Please enter a number:" selected
+    stty erase '^H' && read -p "Please enter a number: " selected
     case "${selected}" in
         1|2|3)
         break
@@ -443,10 +443,10 @@ set_ssmgr()
 
 set_mailgun()
 {
-    echo "Please enter baseUrl of mailgun:"
-    stty erase '^H' && read -p "(Example: https://api.mailgun.net/v3/mg.xxxxx.xxx):" mailgunurl
-    echo "Please enter apiKey of mailgun:"
-    stty erase '^H' && read -p "(Example: key-xxxxxxxxxxxxx):" mailgunkey
+    echo "Please enter baseUrl of mailgun: "
+    stty erase '^H' && read -p "(Example: https://api.mailgun.net/v3/mg.xxxxx.xxx): " mailgunurl
+    echo "Please enter apiKey of mailgun: "
+    stty erase '^H' && read -p "(Example: key-xxxxxxxxxxxxx): " mailgunkey
     sed -i "s#https://api.mailgun.net/v3/mg.xxxxx.xxx#${mailgunurl}#g" /root/.ssmgr/webgui.yml
     sed -i "s#key-xxxxxxxxxxxxx#${mailgunkey}#g" /root/.ssmgr/webgui.yml
 }
@@ -457,9 +457,9 @@ set_smtp()
     sed -i "s#baseUrl: 'https://api.mailgun.net/v3/mg.xxxxx.xxx'#username: 'username'#g" /root/.ssmgr/webgui.yml
     sed -i "s#apiKey: 'key-xxxxxxxxxxxxx'#password: 'password'#g" /root/.ssmgr/webgui.yml
     sed -i 'N;28a\\t\thost: 'smtp.your-email.com'' /root/.ssmgr/webgui.yml
-    stty erase '^H' && read -p "Please enter host of SMTP:(smtp.your-email.com):" smtphost
-    stty erase '^H' && read -p "Please enter username of your email:" smtpusrname
-    stty erase '^H' && read -p "Please enter password of your email:" smtppasswd
+    stty erase '^H' && read -p "Please enter host of SMTP:(smtp.your-email.com): " smtphost
+    stty erase '^H' && read -p "Please enter username of your email: " smtpusrname
+    stty erase '^H' && read -p "Please enter password of your email: " smtppasswd
     sed -i "s#username#${smtpusrname}#g" /root/.ssmgr/webgui.yml
     sed -i "s#password#${smtppasswd}#g" /root/.ssmgr/webgui.yml
     sed -i "s#smtp.your-email.com#${smtphost}#g" /root/.ssmgr/webgui.yml
@@ -478,7 +478,7 @@ set_mail()
     echo "# 2. others                                   #"
     echo "###############################################"
     echo
-    stty erase '^H' && read -p "Please enter a number:" mailselected
+    stty erase '^H' && read -p "Please enter a number: " mailselected
     case "${mailselected}" in
         1|2)
         break
@@ -574,7 +574,7 @@ install_bbr()
     detele_kernel
 	BBR_grub
 	echo -e "[${green}Info${plain}] Now you need to reboot to make the bbr work."
-	stty erase '^H' && read -p "[${green}Info${plain}] Do you like to reboot right now? [Y/n] :" yn
+	stty erase '^H' && read -p "[${green}Info${plain}] Do you like to reboot right now? [Y/n] : " yn
 	[ -z "${yn}" ] && yn="y"
 	if [[ $yn == [Yy] ]]; then
 		echo -e "${Info} Rebooting..."
@@ -584,7 +584,7 @@ install_bbr()
 
 check_bbr()
 {
-    stty erase '^H' && read -p "Do you like to install the BBRmod?[Y/n]:" yn
+    stty erase '^H' && read -p "Do you like to install the BBRmod?[Y/n]: " yn
     [ -z "$yn" ] && yn="y"
     if [[ $yn == [Yy] ]]; then
         echo -e "[${green}Info${plain}] Start installing the BBRmod..."
