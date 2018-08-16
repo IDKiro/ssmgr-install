@@ -635,6 +635,7 @@ remove_all()
 startbbrmod()
 {
 	remove_all
+    yum install -y gcc
     mkdir bbrmod && cd bbrmod
     wget -N --no-check-certificate http://raw.githubusercontent.com/IDKiro/ssmgr-install/master/bbr/tcp_tsunami.c
     echo "obj-m:=tcp_tsunami.o" > Makefile
