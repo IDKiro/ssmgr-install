@@ -454,13 +454,13 @@ set_mailgun()
 set_smtp()
 {
     sed -i "s#type: 'mailgun'#type: 'smtp'#g" /root/.ssmgr/webgui.yml
-    sed -i "s#baseUrl: 'https://api.mailgun.net/v3/mg.xxxxx.xxx'#username: 'username'#g" /root/.ssmgr/webgui.yml
+    sed -i "s#baseUrl: 'https://api.mailgun.net/v3/mg.xxxxx.xxx'#username: 'user_name'#g" /root/.ssmgr/webgui.yml
     sed -i "s#apiKey: 'key-xxxxxxxxxxxxx'#password: 'password'#g" /root/.ssmgr/webgui.yml
     sed -i 'N;28a\\t\thost: 'smtp.your-email.com'' /root/.ssmgr/webgui.yml
     stty erase '^H' && read -p "Please enter host of SMTP:(smtp.your-email.com): " smtphost
     stty erase '^H' && read -p "Please enter username of your email: " smtpusrname
     stty erase '^H' && read -p "Please enter password of your email: " smtppasswd
-    sed -i "s#username#${smtpusrname}#g" /root/.ssmgr/webgui.yml
+    sed -i "s#user_name#${smtpusrname}#g" /root/.ssmgr/webgui.yml
     sed -i "s#password#${smtppasswd}#g" /root/.ssmgr/webgui.yml
     sed -i "s#smtp.your-email.com#${smtphost}#g" /root/.ssmgr/webgui.yml
 }
